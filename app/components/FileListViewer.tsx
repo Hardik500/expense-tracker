@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import FileViewer from "app/components/FileViewer";
+import FileEditor from "~/components/FileEditor";
 
 interface FileListViewerProps {
     files: File[];
@@ -17,7 +17,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
         }
     }, []);
 
-    const viewFile = (file: File) => {
+    const editFile = (file: File) => {
         setActiveFile(file);
     };
 
@@ -46,7 +46,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                                     {file.name}
                                 </th>
                                 <td className="px-6 py-4 text-left">
-                                    <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => viewFile(file)}>View</button>
+                                    <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => editFile(file)}>Edit</button>
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => onRemove(file)}>Remove</button>
@@ -56,7 +56,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                 </tbody>
             </table>
             <br className="mb-16" />
-            {activeFile && <FileViewer file={activeFile} />}
+            {activeFile && <FileEditor file={activeFile} />}
         </div>
     )
 }
