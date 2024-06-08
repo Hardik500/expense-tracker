@@ -1,18 +1,19 @@
 import { useState, useRef } from "react";
 import OutsideClickHandler from 'react-outside-click-handler';
 import classNames from 'classnames';
-
+import { FIELDS_LIST } from "app/helper/constant";
 interface FileHeaderProps {
     header: { label: string, field: string }
-    fieldsList: { [key: string]: string };
     handleClick: (field: string) => void;
 }
 
-export const FileHeader = ({ header, fieldsList, handleClick }: FileHeaderProps) => {
+export const FileHeader = ({ header, handleClick }: FileHeaderProps) => {
     const buttonRef = useRef(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [dropdownStyle, setDropdownStyle] = useState({});
-    const columnHeader = Object.values(fieldsList).includes(header.field) ? header.field : header.label;
+    const validFieldsList = Object.values(FIELDS_LIST).filter(field => field.isValid).map(field => field.label);
+    const validFields = Object.keys(FIELDS_LIST).filter(key => validFieldsList.includes(FIELDS_LIST[key as keyof typeof FIELDS_LIST].label));
+    const columnHeader = validFields.includes(header.field) ? header.field : header.label;
 
     const toggleDropdown = () => {
         if (!dropdownOpen) {
@@ -45,7 +46,7 @@ export const FileHeader = ({ header, fieldsList, handleClick }: FileHeaderProps)
                 )} role="menu" aria-orientation="vertical" aria-labelledby="dropdownDefaultButton">
                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         {
-                            Object.values(fieldsList).map((field, index) => (
+                            validFields.map((field, index) => (
                                 <li key={index} className="px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer" role="button" tabIndex={index} onClick={() => onClick(field)}>{field}</li>
                             ))
                         }
