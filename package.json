@@ -14,6 +14,7 @@
     "@remix-run/express": "^2.9.2",
     "@remix-run/node": "^2.9.2",
     "@remix-run/react": "^2.9.2",
+    "chrono-node": "^2.7.6",
     "classnames": "^2.5.1",
     "cross-env": "^7.0.3",
     "express": "^4.19.2",
