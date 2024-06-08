@@ -1,36 +1,21 @@
 import { useEffect, useState } from "react";
-import { FileHeader } from "app/components/FileHeader"
 import * as XLSX from 'xlsx';
+import { FileHeader } from "app/components/FileHeader"
+import { FIELDS_LIST } from "app/helper/constant";
+import { filterData } from "app/helper/dataUtil";
 
 interface FileViewerProps {
     file: File;
 }
 
-const SUPPORTED_FIELDS = {
-    DATE: 'Date',
-    DESCRIPTION: 'Description',
-    DEBIT: 'Debit',
-    CREDIT: 'Credit',
-    BALANCE: 'Balance',
-    CATEGORY: 'Category',
-};
-
-const FIELDS_LIST = {
-    ...SUPPORTED_FIELDS,
-    NONE: 'None',
-    UNKNOWN: 'Unknown'
-};
-
-
 export default function FileViewer({ file }: FileViewerProps) {
     const SPECIAL_CHAR = "$%";
     const [dataHeaders, setDataHeaders] = useState<{ label: string, field: string }[]>([]);
-    console.log("🚀 ~ FileViewer ~ dataHeaders:", dataHeaders);
     const [dataRows, setDataRows] = useState<string[][]>([]);
 
     const handleHeaders = (headers: string[]) => {
         const trimmedHeaders = headers.map(header => header.trim());
-        setDataHeaders(trimmedHeaders.map(header => ({ label: header, field: FIELDS_LIST.UNKNOWN })));
+        setDataHeaders(trimmedHeaders.map(header => ({ label: header, field: FIELDS_LIST.UNKNOWN.label })));
     }
 
     const handleRows = (rows: string[][]) => {
@@ -65,6 +50,8 @@ export default function FileViewer({ file }: FileViewerProps) {
         const updatedHeaders = [...dataHeaders];
         updatedHeaders[index].field = field;
         setDataHeaders(updatedHeaders);
+        const filteredData = filterData({ data: dataRows, field: updatedHeaders[index].field, index });
+        setDataRows(filteredData);
     };
 
     useEffect(() => {
@@ -91,7 +78,7 @@ export default function FileViewer({ file }: FileViewerProps) {
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         {
-                            dataHeaders.map((header, index) => <FileHeader key={index} header={header} fieldsList={SUPPORTED_FIELDS} handleClick={(field) => handleHeaderClick(field, index)} />)
+                            dataHeaders.map((header, index) => <FileHeader key={index} header={header} handleClick={(field) => handleHeaderClick(field, index)} />)
                         }
                     </tr>
                 </thead>
