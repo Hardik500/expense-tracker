@@ -13,7 +13,6 @@ export const meta: MetaFunction = () => {
 };
 
 export default function Index() {
-
   const [files, setFiles] = useState<Iterable<File> | ArrayLike<File> | null>(null);
     
   const handleRemove = (file: File) => {
@@ -21,7 +20,7 @@ export default function Index() {
   }
 
   return (
-    <div className="p-16">
+    <div className="p-16 h-full">
       <ExpenseUploader setFiles={setFiles} />
       <FileListViewer files={Array.from(files || [])} onRemove={handleRemove} />
     </div>
