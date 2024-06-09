@@ -1,37 +1,61 @@
-export const FIELDS_LIST = {
-    DATE: {
+export const FIELDS_MAP = {
+    DATE: "DATE",
+    DESCRIPTION: "DESCRIPTION",
+    UNKNOWN: "UNKNOWN",
+    CATEGORY: "CATEGORY",
+    CREDIT: "CREDIT",
+    DEBIT: "DEBIT",
+    BALANCE: "BALANCE"
+};
+
+interface FieldList {
+    label: string;
+    value: string;
+    isValid: boolean;
+    type: string;
+}
+
+export const FIELDS_LIST: FieldList[] = [
+    {
         label: 'Date',
+        value: FIELDS_MAP.DATE,
         isValid: true,
         type: 'date'
     },
-    DESCRIPTION: {
+    {
         label: 'Description',
+        value: FIELDS_MAP.DESCRIPTION,
         isValid: true,
         type: 'string'
     },
-    UNKNOWN: {
+    {
         label: 'Unknown',
+        value: FIELDS_MAP.UNKNOWN,
         isValid: false,
         type: 'string'
     },
-    CATEGORY: {
+    {
         label: 'Category',
+        value: FIELDS_MAP.CATEGORY,
         isValid: true,
         type: 'string'
     },
-    CREDIT: {
+    {
         label: 'Credit',
+        value: FIELDS_MAP.CREDIT,
         isValid: true,
         type: 'number'
     },
-    DEBIT: {
+    {
         label: 'Debit',
+        value: FIELDS_MAP.DEBIT,
         isValid: true,
         type: 'number'
     },
-    BALANCE: {
+    {
         label: 'Balance',
+        value: FIELDS_MAP.BALANCE,
         isValid: true,
         type: 'number'
     }
-};
+];

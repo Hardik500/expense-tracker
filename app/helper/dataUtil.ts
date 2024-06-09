@@ -3,7 +3,7 @@ import * as chrono from 'chrono-node';
 
 interface filterDataProps {
     data: string[][],
-    field: keyof typeof FIELDS_LIST,
+    field: string,
     index: number
 }
 
@@ -30,11 +30,11 @@ const isValidType = (value: string, type: string) => {
 };
 
 export const filterData = ({ data, field, index }: filterDataProps) => {
-    if (!FIELDS_LIST[field] || !FIELDS_LIST[field].isValid) {
+    if (!FIELDS_LIST.find(f => f.value === field)) {
         console.log("Invalid field");
         return data;
     }
-    const expectedType = FIELDS_LIST[field].type;
+    const expectedType = FIELDS_LIST.find(f => f.value === field)?.type || 'string';
 
     const filteredData = data.filter(entry => {
         const fieldValue = entry[index];

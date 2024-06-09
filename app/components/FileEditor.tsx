@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import * as XLSX from 'xlsx';
 import { FileHeader } from "app/components/FileHeader"
-import { FIELDS_LIST } from "app/helper/constant";
+import { FIELDS_MAP } from "app/helper/constant";
 import { filterData } from "app/helper/dataUtil";
 
 interface FileViewerProps {
@@ -15,7 +15,7 @@ export default function FileViewer({ file }: FileViewerProps) {
 
     const handleHeaders = (headers: string[]) => {
         const trimmedHeaders = headers.map(header => header.trim());
-        setDataHeaders(trimmedHeaders.map(header => ({ label: header, field: FIELDS_LIST.UNKNOWN.label })));
+        setDataHeaders(trimmedHeaders.map(header => ({ label: header, field: FIELDS_MAP.UNKNOWN })));
     }
 
     const handleRows = (rows: string[][]) => {
@@ -34,7 +34,7 @@ export default function FileViewer({ file }: FileViewerProps) {
 
                 // Get all rows with the max row size where the first row is the header and the rest are data
                 // Also remove any row that has more than one % in it
-                const [headers, ...rows] = data
+                const [headers, ...rows]: string[][] = data
                     .filter(row => row.filter((data: string) => data.toString().includes(SPECIAL_CHAR)).length <= 1)
                     .map(row => row.map((data: string) => data.toString().replace(SPECIAL_CHAR, '0')));
 
@@ -47,6 +47,7 @@ export default function FileViewer({ file }: FileViewerProps) {
     }
 
     const handleHeaderClick = (field: string, index: number) => {
+        console.log("🚀 ~ handleHeaderClick ~ field:", field);
         const updatedHeaders = [...dataHeaders];
         updatedHeaders[index].field = field;
         setDataHeaders(updatedHeaders);
