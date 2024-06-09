@@ -28,13 +28,13 @@ const Dropdown = ({ items, onItemClick, buttonLabel }: DropdownProps) => {
     return (
         <div className="relative">
             <OutsideClickHandler onOutsideClick={() => setIsOpen(false)}>
-                <button ref={buttonRef} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" onClick={toggleDropdown}>
+                <button ref={buttonRef} className="text-white bg-slate-500 hover:bg-slate-600 focus:ring-4 focus:outline-none focus:ring-slate-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center" onClick={toggleDropdown}>
                     {buttonLabel}
                     <svg className="ml-2 -mr-1 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                     </svg>
                 </button>
-                <div style={dropdownStyle} className={classNames("absolute z-10 bg-white rounded shadow", { 'hidden': !isOpen })}>
+                <div style={dropdownStyle} className={classNames("absolute z-10 bg-white rounded shadow overflow-y-auto max-h-60", { 'hidden': !isOpen })}>
                     <ul className="text-gray-700">
                         {items.map((item, index) => (
                             <li key={index} className="w-full px-4 py-2 hover:bg-gray-100">
