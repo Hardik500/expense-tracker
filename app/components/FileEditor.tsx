@@ -47,7 +47,6 @@ export default function FileViewer({ file }: FileViewerProps) {
     }
 
     const handleHeaderClick = (field: string, index: number) => {
-        console.log("🚀 ~ handleHeaderClick ~ field:", field);
         const updatedHeaders = [...dataHeaders];
         updatedHeaders[index].field = field;
         setDataHeaders(updatedHeaders);
