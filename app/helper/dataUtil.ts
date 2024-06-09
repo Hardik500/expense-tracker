@@ -13,8 +13,8 @@ const isFieldDate = (field: string) => {
 };
 
 const isFieldNumber = (field: string) => {
-    // Check if the field is a number or float using regex
-    return field.match(/^-?\d*\.?\d+$/) !== null;
+    // Check if the field is either empty or if field contains at least one digit
+    return field === '' || /\d/.test(field);
 }
 
 
