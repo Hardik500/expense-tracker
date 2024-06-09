@@ -21,7 +21,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
                 throw new Error("Network response was not ok");
             }
             const data = await response.json();
-            if (data) {
+            if (data.fieldMap) {
                 setDataHeaders(data.fieldMap);
             }
         } catch (error) {
@@ -95,8 +95,15 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
             <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                    Statement
-                    <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Showing {dataRows.length} rows</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        Statement
+                        <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Showing {dataRows.length} rows</p>
+                    </div>
+                    <button className="px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" type="submit" aria-label="Add Expense">
+                        Update Fields
+                    </button>
+                </div>
                 </caption>
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
@@ -109,7 +116,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
                     {dataRows.map((rowData, index) => (
                         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700" key={index}>
                             {rowData.map((row, index) => (
-                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white" key={index}>
+                                <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white overflow-hidden text-ellipsis max-w-20" key={index}>
                                     {row}
                                 </th>
                             ))}
