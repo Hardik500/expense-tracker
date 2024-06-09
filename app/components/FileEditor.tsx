@@ -6,12 +6,28 @@ import { filterData } from "app/helper/dataUtil";
 
 interface FileViewerProps {
     file: File;
+    bankName: string | null;
 }
 
-export default function FileViewer({ file }: FileViewerProps) {
+export default function FileViewer({ file, bankName }: FileViewerProps) {
     const SPECIAL_CHAR = "$%";
     const [dataHeaders, setDataHeaders] = useState<{ label: string, field: string }[]>([]);
     const [dataRows, setDataRows] = useState<string[][]>([]);
+
+    const fetchBankFields = async (bankName: string) => {
+        try {
+            const response = await fetch(`/bankFields?bankName=${bankName}`);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            if (data) {
+                setDataHeaders(data.fieldMap);
+            }
+        } catch (error) {
+            console.error("Failed to fetch bank fields:", error);
+        }
+    };
 
     const handleHeaders = (headers: string[]) => {
         const trimmedHeaders = headers.map(header => header.trim());
@@ -53,6 +69,13 @@ export default function FileViewer({ file }: FileViewerProps) {
         const filteredData = filterData({ data: dataRows, field: updatedHeaders[index].field, index });
         setDataRows(filteredData);
     };
+
+
+    useEffect(() => {
+        if (bankName) {
+            fetchBankFields(bankName);
+        }
+    }, [bankName]);
 
     useEffect(() => {
         handleFile(file);

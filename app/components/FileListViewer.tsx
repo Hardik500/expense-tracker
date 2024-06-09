@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import FileEditor from "~/components/FileEditor";
-import Dropdown from 'app/common/Dropdown';
-import BankData from "app/helper/banks.json";
+import Dropdown from '~/common/Dropdown';
+import BankData from "~/helper/banks.json";
 
 interface FileListViewerProps {
     files: File[];
@@ -10,7 +10,7 @@ interface FileListViewerProps {
 
 export default function FileListViewer({ files, onRemove }: FileListViewerProps) {
     const [activeFile, setActiveFile] = useState<File | null>(null);
-    const [activeBank, setActiveBank] = useState<string | null>(null);
+    const [activeBank, setActiveBank] = useState<string | null>("");
     const banksList = Object.entries(BankData).sort((a, b) => a[1].localeCompare(b[1])).map(([key, value]) => ({ label: value, value: key }))
 
     useEffect(() => {
@@ -71,7 +71,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                 </tbody>
             </table>
             <br className="mb-16" />
-            {activeFile && <FileEditor file={activeFile} />}
+            {activeFile && <FileEditor file={activeFile} bankName={activeBank} />}
         </div>
     )
 }
