@@ -29,6 +29,27 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
         }
     };
 
+    const updateBankFields = async () => {
+        try {
+            const response = await fetch(`/bankFields`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bankName, fieldMap: dataHeaders })
+            });
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            if (data.bank) {
+                setDataHeaders(data.bank.field_map);
+            }
+        } catch (error) {
+            console.error("Failed to update bank fields:", error);
+        }
+    }
+
     const handleHeaders = (headers: string[]) => {
         const trimmedHeaders = headers.map(header => header.trim());
         setDataHeaders(trimmedHeaders.map(header => ({ label: header, field: FIELDS_MAP.UNKNOWN })));
@@ -100,7 +121,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
                         Statement
                         <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Showing {dataRows.length} rows</p>
                     </div>
-                    <button className="px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" type="submit" aria-label="Add Expense">
+                    <button className="px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" onClick={updateBankFields}>
                         Update Fields
                     </button>
                 </div>
