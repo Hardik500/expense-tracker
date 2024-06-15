@@ -143,7 +143,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
                         Statement
                         <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Showing {dataRows.length} rows</p>
                     </div>
-                    <button className="px-4 py-2 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" onClick={updateBankFields}>
+                    <button className="px-4 py-2 mr-4 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" onClick={updateBankFields}>
                         Update Fields
                     </button>
                 </div>
