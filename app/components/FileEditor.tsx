@@ -32,7 +32,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
 
     const fetchBankFields = async (bankName: string) => {
         try {
-            const response = await fetch(`/bankFields?bankName=${bankName}`);
+            const response = await fetch(`/bankFieldsMap?bankName=${bankName}`);
             setFetchedBankFields(true);
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -49,7 +49,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
 
     const updateBankFields = async () => {
         try {
-            const response = await fetch(`/bankFields`, {
+            const response = await fetch(`/bankFieldsMap`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
