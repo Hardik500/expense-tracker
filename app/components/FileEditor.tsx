@@ -11,8 +11,24 @@ interface FileViewerProps {
 
 export default function FileViewer({ file, bankName }: FileViewerProps) {
     const SPECIAL_CHAR = "$%";
+    const [bankDataHeaders, setBankDataHeaders] = useState<{ label: string, field: string }[]>([]);
     const [dataHeaders, setDataHeaders] = useState<{ label: string, field: string }[]>([]);
     const [dataRows, setDataRows] = useState<string[][]>([]);
+
+    const updateBankFieldsWithHeaders = (dataHeaders: { label: string, field: string }[]) => {
+        if (dataHeaders.length > 0 && dataRows.length > 0) {
+            let tempDataRows = [...dataRows];
+
+            for (let i = 0; i < dataHeaders.length; i++) {
+                const field = dataHeaders[i].field;
+                if (field !== FIELDS_MAP.UNKNOWN) {
+                    tempDataRows = filterData({ data: tempDataRows, field, index: i });
+                }
+            }
+
+            setDataRows(tempDataRows);
+        }
+    }
 
     const fetchBankFields = async (bankName: string) => {
         try {
@@ -22,7 +38,9 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
             }
             const data = await response.json();
             if (data.fieldMap) {
+                setBankDataHeaders(data.fieldMap);
                 setDataHeaders(data.fieldMap);
+                updateBankFieldsWithHeaders(data.fieldMap);
             }
         } catch (error) {
             console.error("Failed to fetch bank fields:", error);
@@ -64,6 +82,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
         reader.onload = (event) => {
             const data = event.target?.result;
             const workbook = XLSX.read(data, { type: 'binary' });
+            let headersProcessed = false;
 
             workbook.SheetNames.forEach(sheetName => {
                 // Convert the data to JSON
@@ -77,7 +96,12 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
 
                 handleHeaders(headers);
                 handleRows(rows);
+                headersProcessed = true;
             });
+            
+            if (headersProcessed) {
+                updateBankFieldsWithHeaders(dataHeaders);
+            }
         }
 
         reader.readAsArrayBuffer(file);
@@ -91,13 +115,6 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
         setDataRows(filteredData);
     };
 
-
-    useEffect(() => {
-        if (bankName) {
-            fetchBankFields(bankName);
-        }
-    }, [bankName]);
-
     useEffect(() => {
         handleFile(file);
 
@@ -105,8 +122,13 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
             setDataHeaders([]);
             setDataRows([]);
         }
-    }, [file]);
+    }, []);
 
+    useEffect(() => {
+        if (bankName && bankDataHeaders.length === 0) {
+            fetchBankFields(bankName);
+        }
+    }, [bankDataHeaders, dataRows, bankName]);
 
     if (!dataHeaders || dataHeaders.length === 0) {
         return null;
