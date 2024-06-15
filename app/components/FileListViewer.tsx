@@ -23,8 +23,10 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
         }
     }, []);
 
-    const readBankName = async (file: File) => {
+    const readBankName = async (file: File, filesBankMap: { [key: string]: string }) => {
         const reader = new FileReader();
+        let bankName = "";
+
         reader.onload = (e) => {
             const data = e.target?.result;
             const workbook = XLSX.read(data, { type: 'array' });
@@ -34,8 +36,6 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
             // If it does then set the bank name for the file
             // The value won't be in a specific cell, it can be anywhere in the sheet and it can be part of a sentence
             // Start scanning the sheet from the start and stop when the key is found
-            
-            let bankName = "";
 
             for (const key of Object.keys(BankData)) {
                 const cell = Object.values(sheet);
@@ -49,11 +49,15 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                 }
             }
 
-            if (bankName) {
-                setFilesBankMap({ ...filesBankMap, [file.name]: bankName });
-            }
-
         };
+
+
+        reader.onloadend = () => {
+            if (bankName) {
+                filesBankMap[file.name] = bankName;
+                setFilesBankMap(filesBankMap);
+            }
+        }
 
         reader.readAsArrayBuffer(file);
     }
@@ -61,10 +65,10 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
     useEffect(() => {
         // Set bank name for each file
 
+        const filesBankMapCopy = {};
+
         files.forEach(async (file) => {
-            if (!filesBankMap[file.name]) {
-                await readBankName(file);
-            }
+            await readBankName(file, filesBankMapCopy);
         });
     }, [files]);
 
