@@ -1,7 +1,8 @@
 import React, { useMemo, useState, Suspense } from "react";
 import { MetaFunction } from "@remix-run/node";
-import FileListViewer from "app/components/FileListViewer";
-const LazyExpenseUploader = React.lazy(() => import("app/components/ExpenseUploader"));
+import FileListViewer from "~/components/FileListViewer";
+import FileEditor from "~/components/FileEditor";
+const LazyExpenseUploader = React.lazy(() => import("~/components/ExpenseUploader"));
 
 export const meta: MetaFunction = () => {
   return [
@@ -15,7 +16,8 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const [files, setFiles] = useState<Iterable<File> | ArrayLike<File> | null>(null);
   const filesArray: File[] = useMemo(() => Array.from(files || []), [files]);
-    
+  const [activeFile, setActiveFile] = useState<{ bankName: string, file: File } | null>(null);
+
   const handleRemove = (file: File) => {
       setFiles(filesArray.filter((f) => f.name !== file.name));
   }
@@ -25,7 +27,9 @@ export default function Index() {
       <Suspense fallback={<div>Loading...</div>}>
         <LazyExpenseUploader setFiles={setFiles} />
       </Suspense>
-      {filesArray.length > 0 && <FileListViewer files={filesArray} onRemove={handleRemove} />}
+      {filesArray.length > 0 && <FileListViewer files={filesArray} onRemove={handleRemove} setActiveFile={setActiveFile} />}
+      <br className="mb-16" />
+      {activeFile && <FileEditor file={activeFile.file} bankName={activeFile.bankName} />}
     </div>
   );
 }

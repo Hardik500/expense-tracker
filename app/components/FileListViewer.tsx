@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import FileEditor from "~/components/FileEditor";
 import Dropdown from '~/common/Dropdown';
 import BankData from "~/helper/banks.json";
 import * as XLSX from 'xlsx';
@@ -7,23 +6,20 @@ import * as XLSX from 'xlsx';
 interface FileListViewerProps {
     files: File[];
     onRemove: (file: File) => void;
+    setActiveFile: (file: { bankName: string, file: File } | null) => void;
 }
 
-export default function FileListViewer({ files, onRemove }: FileListViewerProps) {
-    const [activeFile, setActiveFile] = useState<File | null>(null);
-    const [filesBankMap, setFilesBankMap] = useState<{ [key: string]: string }>({});
+export default function FileListViewer({ files, setActiveFile, onRemove }: FileListViewerProps) {
+    const [filesBankMap, setFilesBankMap] = useState<{ [key: string]: { bankName: string, active: boolean, file: File } }>({});
     const banksList = Object.entries(BankData).sort((a, b) => a[1].localeCompare(b[1])).map(([key, value]) => ({ label: value, value: key }))
 
     useEffect(() => {
-        setActiveFile(null);
-
         return () => {
             setFilesBankMap({});
-            setActiveFile(null);
         }
     }, []);
 
-    const readBankName = async (file: File, filesBankMap: { [key: string]: string }) => {
+    const readBankName = async (file: File, filesBankMap: { [key: string]: { bankName: string, active: boolean, file: File } }) => {
         const reader = new FileReader();
         let bankName = "";
 
@@ -54,7 +50,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
 
         reader.onloadend = () => {
             if (bankName) {
-                filesBankMap[file.name] = bankName;
+                filesBankMap[file.name] = { bankName, active: false, file };
                 setFilesBankMap(filesBankMap);
             }
         }
@@ -73,12 +69,16 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
     }, [files]);
 
     const editFile = (file: File) => {
-        setActiveFile(file);
+        setFilesBankMap((prev) => ({ ...prev, [file.name]: { ...prev[file.name], active: true } }));
     };
 
-    const handleBankChange = (file: File, bank: string) => {
-        setFilesBankMap({ ...filesBankMap, [file.name]: bank });
+    const handleBankChange = (file: File, bankName: string) => {
+        setFilesBankMap((prev) => ({ ...prev, [file.name]: { ...prev[file.name], bankName } }));
     }
+
+    useEffect(() => {
+        setActiveFile(Object.values(filesBankMap).find((file) => file.active) || null);
+    }, [filesBankMap]);
 
     if (!files || files.length === 0) {
         return null;
@@ -111,7 +111,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                                     <Dropdown
                                         items={banksList}
                                         onItemClick={(bank) => handleBankChange(file, bank)}
-                                        buttonLabel={filesBankMap[file.name] || "Select Bank"}
+                                        buttonLabel={filesBankMap[file.name]?.bankName || "Select bank"}
                                     />
                                 </td>
                                 {filesBankMap[file.name] && <td className="px-6 py-4 text-left w-1/12">
@@ -124,8 +124,6 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                         ))}
                 </tbody>
             </table>
-            <br className="mb-16" />
-            {activeFile && filesBankMap[activeFile?.name || ""] && <FileEditor file={activeFile} bankName={filesBankMap[activeFile?.name || ""]} />}
         </div>
     )
 }
