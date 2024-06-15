@@ -17,3 +17,14 @@ model bank_fields_map {
   bank_name String
   field_map BankFieldsMapFieldMap[]
 }
+
+model bank_statement {
+  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
+  bank_name String
+  description String
+  debit Float
+  credit Float
+  balance Float
+  category String
+  date DateTime
+}
