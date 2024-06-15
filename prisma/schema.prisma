@@ -20,7 +20,7 @@ model bank_fields_map {
 
 model bank_statement {
   id        String                  @id @default(auto()) @map("_id") @db.ObjectId
-  bank_name String
+  bank   String
   description String
   debit Float
   credit Float
