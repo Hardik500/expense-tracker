@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import FileEditor from "~/components/FileEditor";
 import Dropdown from '~/common/Dropdown';
 import BankData from "~/helper/banks.json";
+import * as XLSX from 'xlsx';
 
 interface FileListViewerProps {
     files: File[];
@@ -22,8 +23,49 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
         }
     }, []);
 
-    useEffect(() => {
+    const readBankName = async (file: File) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const data = e.target?.result;
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            
+            // From BankData file get all the keys and check if in the sheet there is a cell that contains the key value
+            // If it does then set the bank name for the file
+            // The value won't be in a specific cell, it can be anywhere in the sheet and it can be part of a sentence
+            // Start scanning the sheet from the start and stop when the key is found
+            
+            let bankName = "";
 
+            for (const key of Object.keys(BankData)) {
+                const cell = Object.values(sheet);
+
+                for (let i = 0; i < cell.length; i++) {
+                    const cellValue = cell[i].v;
+                    if (cellValue && cellValue.toString().toLowerCase().includes(key.toLowerCase())) {
+                        bankName = key;
+                        break;
+                    }
+                }
+            }
+
+            if (bankName) {
+                setFilesBankMap({ ...filesBankMap, [file.name]: bankName });
+            }
+
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+
+    useEffect(() => {
+        // Set bank name for each file
+
+        files.forEach(async (file) => {
+            if (!filesBankMap[file.name]) {
+                await readBankName(file);
+            }
+        });
     }, [files]);
 
     const editFile = (file: File) => {
