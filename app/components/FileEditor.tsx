@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import * as XLSX from 'xlsx';
 import { FileHeader } from "app/components/FileHeader"
 import { FIELDS_MAP } from "app/helper/constant";
@@ -11,7 +11,7 @@ interface FileViewerProps {
 
 export default function FileViewer({ file, bankName }: FileViewerProps) {
     const SPECIAL_CHAR = "$%";
-    const [bankDataHeaders, setBankDataHeaders] = useState<{ label: string, field: string }[]>([]);
+    const [fetchedBankFields, setFetchedBankFields] = useState<boolean>(false);
     const [dataHeaders, setDataHeaders] = useState<{ label: string, field: string }[]>([]);
     const [dataRows, setDataRows] = useState<string[][]>([]);
 
@@ -33,12 +33,12 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
     const fetchBankFields = async (bankName: string) => {
         try {
             const response = await fetch(`/bankFields?bankName=${bankName}`);
+            setFetchedBankFields(true);
             if (!response.ok) {
                 throw new Error("Network response was not ok");
             }
             const data = await response.json();
             if (data.fieldMap) {
-                setBankDataHeaders(data.fieldMap);
                 setDataHeaders(data.fieldMap);
                 updateBankFieldsWithHeaders(data.fieldMap);
             }
@@ -124,11 +124,11 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
         }
     }, []);
 
-    useEffect(() => {
-        if (bankName && bankDataHeaders.length === 0) {
+    useLayoutEffect(() => {
+        if (bankName && !fetchedBankFields) {
             fetchBankFields(bankName);
         }
-    }, [bankDataHeaders, dataRows, bankName]);
+    }, [fetchedBankFields, dataRows, bankName]);
 
     if (!dataHeaders || dataHeaders.length === 0) {
         return null;
