@@ -1,7 +1,7 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState, Suspense } from "react";
 import { MetaFunction } from "@remix-run/node";
-import ExpenseUploader from "app/components/ExpenseUploader";
 import FileListViewer from "app/components/FileListViewer";
+const LazyExpenseUploader = React.lazy(() => import("app/components/ExpenseUploader"));
 
 export const meta: MetaFunction = () => {
   return [
@@ -22,7 +22,9 @@ export default function Index() {
 
   return (
     <div className="p-16 h-full">
-      <ExpenseUploader setFiles={setFiles} />
+      <Suspense fallback={<div>Loading...</div>}>
+        <LazyExpenseUploader setFiles={setFiles} />
+      </Suspense>
       {filesArray.length > 0 && <FileListViewer files={filesArray} onRemove={handleRemove} />}
     </div>
   );
