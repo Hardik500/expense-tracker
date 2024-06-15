@@ -10,21 +10,29 @@ interface FileListViewerProps {
 
 export default function FileListViewer({ files, onRemove }: FileListViewerProps) {
     const [activeFile, setActiveFile] = useState<File | null>(null);
-    const [activeBank, setActiveBank] = useState<string | null>("");
+    const [filesBankMap, setFilesBankMap] = useState<{ [key: string]: string }>({});
     const banksList = Object.entries(BankData).sort((a, b) => a[1].localeCompare(b[1])).map(([key, value]) => ({ label: value, value: key }))
 
     useEffect(() => {
         setActiveFile(null);
 
         return () => {
-            setActiveBank(null);
+            setFilesBankMap({});
             setActiveFile(null);
         }
     }, []);
 
+    useEffect(() => {
+
+    }, [files]);
+
     const editFile = (file: File) => {
         setActiveFile(file);
     };
+
+    const handleBankChange = (file: File, bank: string) => {
+        setFilesBankMap({ ...filesBankMap, [file.name]: bank });
+    }
 
     if (!files || files.length === 0) {
         return null;
@@ -56,11 +64,11 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                                 <td className="px-6 py-4 text-left w-5/12">
                                     <Dropdown
                                         items={banksList}
-                                        onItemClick={(bank) => setActiveBank(bank)}
-                                        buttonLabel={activeBank || 'Select bank'}
+                                        onItemClick={(bank) => handleBankChange(file, bank)}
+                                        buttonLabel={filesBankMap[file.name] || "Select Bank"}
                                     />
                                 </td>
-                                {activeBank && <td className="px-6 py-4 text-left w-1/12">
+                                {filesBankMap[file.name] && <td className="px-6 py-4 text-left w-1/12">
                                     <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline" onClick={() => editFile(file)}>Edit</button>
                                 </td>}
                                 <td className="px-6 py-4 text-right w-1/12">
@@ -71,7 +79,7 @@ export default function FileListViewer({ files, onRemove }: FileListViewerProps)
                 </tbody>
             </table>
             <br className="mb-16" />
-            {activeFile && <FileEditor file={activeFile} bankName={activeBank} />}
+            {activeFile && filesBankMap[activeFile?.name || ""] && <FileEditor file={activeFile} bankName={filesBankMap[activeFile?.name || ""]} />}
         </div>
     )
 }
