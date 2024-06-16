@@ -26,5 +26,6 @@ model bank_statement {
   credit Float
   balance Float
   category String
+  sub_category String
   date DateTime
 }
