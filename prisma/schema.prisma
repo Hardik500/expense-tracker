@@ -27,5 +27,6 @@ model bank_statement {
   balance Float
   category String
   sub_category String
+  currency String
   date DateTime
 }
