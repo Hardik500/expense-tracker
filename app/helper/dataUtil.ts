@@ -43,3 +43,20 @@ export const filterData = ({ data, field, index }: filterDataProps) => {
 
     return filteredData;
 };
+
+export const fillDataByType = (data: string, type: string) => {
+    if (type === 'date') {
+        return chrono.parseDate(data)?.toISOString() || '';
+    } else if (type === 'number') {
+        return parseFloat(data) || 0;
+    }
+    return data;
+}
+
+export const fillDataEntriesByType = ({ data, field, index }: filterDataProps) => {
+    const expectedType = FIELDS_LIST.find(f => f.value === field)?.type || 'string';
+    return data.map(entry => {
+        const fieldValue = entry[index];
+        return isValidType(fieldValue, expectedType) ? fillDataByType(fieldValue, expectedType) : fieldValue;
+    });
+}
