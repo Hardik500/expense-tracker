@@ -3,18 +3,19 @@ import * as XLSX from 'xlsx';
 import { FileHeader } from "app/components/FileHeader"
 import { FIELDS_MAP } from "app/helper/constant";
 import { filterData } from "app/helper/dataUtil";
-import { FileHeaderType } from "~/helper/interfaces";
+import { BankType, FileHeaderType } from "~/helper/interfaces";
 
 
 interface FileViewerProps {
     file: File;
-    bankName: string | null;
-    headers: FileHeaderType[];
+    bank: BankType;
 }
 
-export default function FileViewer({ file, bankName, headers }: FileViewerProps) {
+export default function FileViewer({ file, bank }: FileViewerProps) {
     const SPECIAL_CHAR = "$%";
-    const [dataHeaders, setDataHeaders] = useState<FileHeaderType[]>(headers);
+    const bankId = bank?.id;
+    const bankName = bank?.name;
+    const [dataHeaders, setDataHeaders] = useState<FileHeaderType[]>(bank?.headers);
     const [dataRows, setDataRows] = useState<string[][]>([]);
 
     const updateBankFieldsWithHeaders = useCallback((dataHeaders: FileHeaderType[]) => {
@@ -60,7 +61,7 @@ export default function FileViewer({ file, bankName, headers }: FileViewerProps)
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ bank: bankName, statement: dataRows })
+                body: JSON.stringify({ bank: bankId, statement: dataRows })
             });
             if (!response.ok) {
                 throw new Error("Network response was not ok");

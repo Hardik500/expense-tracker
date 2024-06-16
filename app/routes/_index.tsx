@@ -30,7 +30,7 @@ export default function Index() {
       </Suspense>
       {filesArray.length > 0 && <FileListViewer files={filesArray} onRemove={handleRemove} setActiveFile={setActiveFile} />}
       <br className="mb-16" />
-      {activeFile && <FileEditor file={activeFile.file} bankName={activeFile.bankName} headers={activeFile.headers}/>}
+      {activeFile && <FileEditor file={activeFile.file} bank={bank} />}
     </div>
   );
 }

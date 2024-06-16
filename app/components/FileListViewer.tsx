@@ -27,8 +27,8 @@ export default function FileListViewer({ files, setActiveFile, onRemove }: FileL
                 throw new Error("Network response was not ok");
             }
             const data = await response.json();
-            if (data.fieldMap) {
-                return data.fieldMap;
+            if (data) {
+                return data;
             }
         } catch (error) {
             console.error("Failed to fetch bank fields:", error);
@@ -43,7 +43,7 @@ export default function FileListViewer({ files, setActiveFile, onRemove }: FileL
             const data = e.target?.result;
             const workbook = XLSX.read(data, { type: 'array' });
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
-            
+
             // From BankData file get all the keys and check if in the sheet there is a cell that contains the key value
             // If it does then set the bank name for the file
             // The value won't be in a specific cell, it can be anywhere in the sheet and it can be part of a sentence
@@ -66,8 +66,14 @@ export default function FileListViewer({ files, setActiveFile, onRemove }: FileL
 
         reader.onloadend = async () => {
             if (bankName) {
-                const headers = await fetchBankFields(bankName);
-                filesBankMap[file.name] = { bankName, active: false, file, headers };
+                const { id, field_map } = await fetchBankFields(bankName);
+                filesBankMap[file.name] = {
+                    active: false, file, bank: {
+                        id,
+                        headers: field_map,
+                        name: bankName,
+                    }
+                }
                 setFilesBankMap(filesBankMap);
             }
         }

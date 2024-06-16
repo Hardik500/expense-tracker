@@ -3,14 +3,20 @@ interface FileHeaderType {
     field: string;
 }
 
-interface ActiveFileType {
-    bankName: string;
-    file: File;
-    active: boolean;
+interface BankType {
+    name: string;
+    id: string;
     headers: FileHeaderType[];
 }
 
+interface ActiveFileType {
+    file: File;
+    active: boolean;
+    bank: BankType;
+}
+
 export type {
+    ActiveFileType,
+    BankType,
     FileHeaderType,
-    ActiveFileType
 }

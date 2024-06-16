@@ -16,7 +16,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         }
     });
 
-    return json({ fieldMap: bank?.field_map || null });
+    return json(bank);
 };
 
 export const action: ActionFunctionArgs = async ({ request }) => {
