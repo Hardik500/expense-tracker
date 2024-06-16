@@ -2,6 +2,7 @@ import React, { useMemo, useState, Suspense } from "react";
 import { MetaFunction } from "@remix-run/node";
 import FileListViewer from "~/components/FileListViewer";
 import FileEditor from "~/components/FileEditor";
+import { ActiveFileType } from "~/helper/interfaces";
 const LazyExpenseUploader = React.lazy(() => import("~/components/ExpenseUploader"));
 
 export const meta: MetaFunction = () => {
@@ -16,7 +17,7 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const [files, setFiles] = useState<Iterable<File> | ArrayLike<File> | null>(null);
   const filesArray: File[] = useMemo(() => Array.from(files || []), [files]);
-  const [activeFile, setActiveFile] = useState<{ bankName: string, file: File } | null>(null);
+  const [activeFile, setActiveFile] = useState<ActiveFileType | null>(null);
 
   const handleRemove = (file: File) => {
       setFiles(filesArray.filter((f) => f.name !== file.name));
@@ -29,7 +30,7 @@ export default function Index() {
       </Suspense>
       {filesArray.length > 0 && <FileListViewer files={filesArray} onRemove={handleRemove} setActiveFile={setActiveFile} />}
       <br className="mb-16" />
-      {activeFile && <FileEditor file={activeFile.file} bankName={activeFile.bankName} />}
+      {activeFile && <FileEditor file={activeFile.file} bankName={activeFile.bankName} headers={activeFile.headers}/>}
     </div>
   );
 }

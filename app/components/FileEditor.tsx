@@ -1,21 +1,23 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as XLSX from 'xlsx';
 import { FileHeader } from "app/components/FileHeader"
 import { FIELDS_MAP } from "app/helper/constant";
 import { filterData } from "app/helper/dataUtil";
+import { FileHeaderType } from "~/helper/interfaces";
+
 
 interface FileViewerProps {
     file: File;
     bankName: string | null;
+    headers: FileHeaderType[];
 }
 
-export default function FileViewer({ file, bankName }: FileViewerProps) {
+export default function FileViewer({ file, bankName, headers }: FileViewerProps) {
     const SPECIAL_CHAR = "$%";
-    const [fetchedBankFields, setFetchedBankFields] = useState<boolean>(false);
-    const [dataHeaders, setDataHeaders] = useState<{ label: string, field: string }[]>([]);
+    const [dataHeaders, setDataHeaders] = useState<FileHeaderType[]>(headers);
     const [dataRows, setDataRows] = useState<string[][]>([]);
 
-    const updateBankFieldsWithHeaders = (dataHeaders: { label: string, field: string }[]) => {
+    const updateBankFieldsWithHeaders = useCallback((dataHeaders: FileHeaderType[]) => {
         if (dataHeaders.length > 0 && dataRows.length > 0) {
             let tempDataRows = [...dataRows];
 
@@ -28,24 +30,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
 
             setDataRows(tempDataRows);
         }
-    }
-
-    const fetchBankFields = async (bankName: string) => {
-        try {
-            const response = await fetch(`/bankFieldsMap?bankName=${bankName}`);
-            setFetchedBankFields(true);
-            if (!response.ok) {
-                throw new Error("Network response was not ok");
-            }
-            const data = await response.json();
-            if (data.fieldMap) {
-                setDataHeaders(data.fieldMap);
-                updateBankFieldsWithHeaders(data.fieldMap);
-            }
-        } catch (error) {
-            console.error("Failed to fetch bank fields:", error);
-        }
-    };
+    }, [dataRows]);
 
     const updateBankFields = async () => {
         try {
@@ -68,9 +53,29 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
         }
     }
 
-    const handleHeaders = (headers: string[]) => {
-        const trimmedHeaders = headers.map(header => header.trim());
-        setDataHeaders(trimmedHeaders.map(header => ({ label: header, field: FIELDS_MAP.UNKNOWN })));
+    const uploadStatement = async () => {
+        try {
+            const response = await fetch(`/bankStatement`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bank: bankName, statement: dataRows })
+            });
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            console.log("🚀 ~ uploadStatement ~ data", data);
+        } catch (error) {
+            console.error("Failed to upload statement:", error);
+        }
+    };
+
+    const handleHeaders = (dataHeaders: string[]) => {
+        if (headers && headers.length > 0) return;
+        const trimmedHeaders = dataHeaders.map(header => header.trim());
+        setDataHeaders((prev) => trimmedHeaders.map(header => ({ label: header, field: prev.find(prevHeader => prevHeader.label === header)?.field || FIELDS_MAP.UNKNOWN })));
     }
 
     const handleRows = (rows: string[][]) => {
@@ -117,18 +122,7 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
 
     useEffect(() => {
         handleFile(file);
-
-        return () => {
-            setDataHeaders([]);
-            setDataRows([]);
-        }
     }, []);
-
-    useLayoutEffect(() => {
-        if (bankName && !fetchedBankFields) {
-            fetchBankFields(bankName);
-        }
-    }, [fetchedBankFields, dataRows, bankName]);
 
     if (!dataHeaders || dataHeaders.length === 0) {
         return null;
@@ -143,9 +137,14 @@ export default function FileViewer({ file, bankName }: FileViewerProps) {
                         Statement
                         <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Showing {dataRows.length} rows</p>
                     </div>
-                    <button className="px-4 py-2 mr-4 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" onClick={updateBankFields}>
-                        Update Fields
-                    </button>
+                    <div>
+                        <button className="px-4 py-2 mr-4 text-sm text-white bg-blue-500 rounded-md hover:bg-blue-600" onClick={updateBankFields}>
+                            Update Fields
+                        </button>
+                        <button className="px-4 py-2 text-sm text-white bg-green-500 rounded-md hover:bg-green-600" onClick={uploadStatement}>
+                            Upload Statement
+                        </button>
+                    </div>
                 </div>
                 </caption>
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">

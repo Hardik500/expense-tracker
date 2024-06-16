@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import Dropdown from '~/common/Dropdown';
 import BankData from "~/helper/banks.json";
 import * as XLSX from 'xlsx';
+import { ActiveFileType } from "~/helper/interfaces";
 
 interface FileListViewerProps {
     files: File[];
     onRemove: (file: File) => void;
-    setActiveFile: (file: { bankName: string, file: File } | null) => void;
+    setActiveFile: (file: ActiveFileType | null) => void;
 }
 
 export default function FileListViewer({ files, setActiveFile, onRemove }: FileListViewerProps) {
-    const [filesBankMap, setFilesBankMap] = useState<{ [key: string]: { bankName: string, active: boolean, file: File } }>({});
+    const [filesBankMap, setFilesBankMap] = useState<{ [key: string]: ActiveFileType }>({});
     const banksList = Object.entries(BankData).sort((a, b) => a[1].localeCompare(b[1])).map(([key, value]) => ({ label: value, value: key }))
 
     useEffect(() => {
@@ -19,7 +20,22 @@ export default function FileListViewer({ files, setActiveFile, onRemove }: FileL
         }
     }, []);
 
-    const readBankName = async (file: File, filesBankMap: { [key: string]: { bankName: string, active: boolean, file: File } }) => {
+    const fetchBankFields = (async (bankName: string) => {
+        try {
+            const response = await fetch(`/bankFieldsMap?bankName=${bankName}`);
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            const data = await response.json();
+            if (data.fieldMap) {
+                return data.fieldMap;
+            }
+        } catch (error) {
+            console.error("Failed to fetch bank fields:", error);
+        }
+    });
+
+    const readBankName = async (file: File, filesBankMap: { [key: string]: ActiveFileType }) => {
         const reader = new FileReader();
         let bankName = "";
 
@@ -48,9 +64,10 @@ export default function FileListViewer({ files, setActiveFile, onRemove }: FileL
         };
 
 
-        reader.onloadend = () => {
+        reader.onloadend = async () => {
             if (bankName) {
-                filesBankMap[file.name] = { bankName, active: false, file };
+                const headers = await fetchBankFields(bankName);
+                filesBankMap[file.name] = { bankName, active: false, file, headers };
                 setFilesBankMap(filesBankMap);
             }
         }
