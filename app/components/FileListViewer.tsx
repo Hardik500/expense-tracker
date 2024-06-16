@@ -134,7 +134,7 @@ export default function FileListViewer({ files, setActiveFile, onRemove }: FileL
                                     <Dropdown
                                         items={banksList}
                                         onItemClick={(bank) => handleBankChange(file, bank)}
-                                        buttonLabel={filesBankMap[file.name]?.bankName || "Select bank"}
+                                        buttonLabel={filesBankMap[file.name]?.bank.name || "Select bank"}
                                     />
                                 </td>
                                 {filesBankMap[file.name] && <td className="px-6 py-4 text-left w-1/12">
