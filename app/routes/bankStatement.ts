@@ -37,6 +37,7 @@ interface Statement {
     credit: number;
     balance: number;
     category: string;
+    sub_category: string;
     date: string;
 }
 
