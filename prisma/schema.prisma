@@ -18,15 +18,49 @@ model bank_fields_map {
   field_map BankFieldsMapFieldMap[]
 }
 
-model bank_statement {
+model transactions {
   id        String                  @id @default(auto()) @map("_id") @db.ObjectId
-  bank   String
+  bank_id String
+  original_description String
   description String
   debit Float
   credit Float
   balance Float
-  category String
-  sub_category String
+  category_id String
+  subcategory_id String
   currency String
   date DateTime
+  is_suggested Boolean
+  suggestion_reason String
+}
+
+model categories {
+  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+}
+
+model subcategories {
+  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  category_id String
+}
+
+model transactions_suggestions {
+  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
+  bank_id String
+  suggested_category_id String
+  suggested_subcategory_id String
+  suggestion_reason String
+  status String
+}
+
+model suggestion_rules {
+  id        String                  @id @default(auto()) @map("_id") @db.ObjectId
+  bank_id String
+  description_pattern String
+  amount_pattern String
+  amount_min Float
+  amount_max Float
+  category_id String
+  subcategory_id String
 }
