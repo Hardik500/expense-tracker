@@ -28,7 +28,6 @@ model transactions {
   balance Float
   category_id String
   subcategory_id String
-  currency String
   date DateTime
   is_suggested Boolean
   suggestion_reason String
