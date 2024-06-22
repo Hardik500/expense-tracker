@@ -49,9 +49,50 @@ const handlePost = async (request: Request) => {
         return json({ error: "Statement and bank id are required" }, { status: 400 });
     }
 
-    const bankStatement = await prisma.transactions.createMany({
-        data: statement.map((s) => ({ ...s, bank_id }))
+    // Check if the bank exists in the database
+    const bank = await prisma.bank_fields_map.findUnique({
+        where: {
+            id: bank_id
+        }
     });
 
-    return json({ bankStatement });
+    if (!bank) {
+        return json({ error: "Bank not found" }, { status: 404 });
+    }
+
+    // Check if any entry in the statement already exists in the database and filter them out
+    const existingTransactions = await prisma.transactions.findMany({
+        where: {
+            bank_id: bank_id,
+            original_description: {
+                in: statement.map(s => s.original_description)
+            }
+        }
+    });
+
+    const existingDescriptions = existingTransactions.map(t => t.original_description);
+    const newTransactions = statement.filter(s => !existingDescriptions.includes(s.original_description));
+
+    // If all the transactions already exist, return an empty array
+    if (newTransactions.length === 0) {
+        return json({ createdTransactions: [] });
+    }
+
+    // Create the new transactions
+    const transactions = newTransactions.map(t => {
+        return {
+            original_description: t.original_description,
+            debit: t.debit,
+            credit: t.credit,
+            balance: t.balance,
+            date: new Date(t.date),
+            bank_id: bank_id
+        }
+    });
+
+    const createdTransactions = await prisma.transactions.createMany({
+        data: transactions
+    });
+
+    return json({ createdTransactions });
 }
