@@ -40,7 +40,7 @@ export default function FileViewer({ file, bank }: FileViewerProps) {
     const updateBankFields = async () => {
         try {
             const response = await fetch(`/bankFieldsMap`, {
-                method: 'POST',
+                method: bankId ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
