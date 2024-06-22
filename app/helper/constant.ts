@@ -1,6 +1,6 @@
 export const FIELDS_MAP = {
     DATE: "DATE",
-    DESCRIPTION: "DESCRIPTION",
+    ORIGINAL_DESCRIPTION: "ORIGINAL_DESCRIPTION",
     UNKNOWN: "UNKNOWN",
     CATEGORY: "CATEGORY",
     CREDIT: "CREDIT",
@@ -23,8 +23,8 @@ export const FIELDS_LIST: FieldList[] = [
         type: 'date'
     },
     {
-        label: 'Description',
-        value: FIELDS_MAP.DESCRIPTION,
+        label: 'Original Description',
+        value: FIELDS_MAP.ORIGINAL_DESCRIPTION,
         isValid: true,
         type: 'string'
     },
