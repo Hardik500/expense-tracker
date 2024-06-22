@@ -61,32 +61,30 @@ export default function FileViewer({ file, bank }: FileViewerProps) {
     const uploadStatement = async () => {
         try {
             const mappedData = dataRows.map(row => {
-                console.log("🚀 ~ mappedData ~ row:", row);
                 const mappedRow: Record<string, string> = {};
                 row.forEach((data, index) => {
                     const field = dataHeaders[index].field;
-                    mappedRow[field] = data;
+                    if (field !== FIELDS_MAP.UNKNOWN)
+                        mappedRow[field.toLowerCase()] = data;
                 });
                 return mappedRow;
             });
 
             const statement = {
-                bank: bankId,
+                bankId: bankId,
                 statement: mappedData
             };
 
-            // const response = await fetch(`/bankStatement`, {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify(statement)
-            // });
-            // if (!response.ok) {
-            //     throw new Error("Network response was not ok");
-            // }
-            // const data = await response.json();
-            // console.log("🚀 ~ uploadStatement ~ data", data);
+            const response = await fetch(`/transactions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(statement)
+            });
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
         } catch (error) {
             console.error("Failed to upload statement:", error);
         }

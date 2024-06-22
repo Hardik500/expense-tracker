@@ -23,7 +23,7 @@ export const FIELDS_LIST: FieldList[] = [
         type: 'date'
     },
     {
-        label: 'Original Description',
+        label: 'Description',
         value: FIELDS_MAP.ORIGINAL_DESCRIPTION,
         isValid: true,
         type: 'string'

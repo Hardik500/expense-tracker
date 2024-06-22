@@ -43,7 +43,7 @@ interface Raw_Transaction {
 const handlePost = async (request: Request) => {
     const data = await request.json();
     const statement: Raw_Transaction[] = data.statement;
-    const bank_id: string = data.bank_id;
+    const bank_id: string = data.bankId;
     
     if (!statement || !bank_id) {
         return json({ error: "Statement and bank id are required" }, { status: 400 });
