@@ -4,7 +4,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
       <Navbar />
-      {children}
+      <div className="p-16 h-full">
+        {children}
+      </div>
     </div>
   );
 }

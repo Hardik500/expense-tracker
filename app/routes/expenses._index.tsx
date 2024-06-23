@@ -18,7 +18,7 @@ const Expenses = () => {
   };
 
   return (
-    <div className="p-16 h-full">
+    <div>
       <Suspense fallback={<div>Loading...</div>}>
         <LazyExpenseUploader setFiles={setFiles} />
       </Suspense>
